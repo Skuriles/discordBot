@@ -1,4 +1,4 @@
-#How To
+# How To
 
 1.  Download Code
 2.  Do "npm install" in root folder
