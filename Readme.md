@@ -12,3 +12,16 @@
 
 4.  Replace all icons and role names according to your wishes in code
 5.  Do "node app.js"
+
+Bot needs the following rights:
+
+1.  Role Management
+2.  Send Messages
+3.  Manage Messages (to create pin/sticky messages)
+4.  Bot role must be higher than the roles he provides
+
+Create Bot and get a token:
+https://github.com/reactiflux/discord-irc/wiki/Creating-a-discord-bot-&-getting-a-token
+
+Add to server:
+https://github.com/jagrosh/MusicBot/wiki/Adding-Your-Bot-To-Your-Server
