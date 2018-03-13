@@ -11,3 +11,4 @@
 ```
 
 4.  Replace all icons and role names according to your wishes in code
+5.  Do "node app.js"
