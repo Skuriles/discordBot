@@ -1,6 +1,7 @@
 {
   "description": "MoguaiTestBot",
   "dependencies": {
-    "discord.js": "github:hydrabolt/discord.js#11.3-dev"
+    "discord.js": "github:hydrabolt/discord.js#11.3-dev",
+    "jsonfile": "^4.0.0"
   }
 }
