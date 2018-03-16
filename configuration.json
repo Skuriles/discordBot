@@ -1,0 +1,31 @@
+{
+  "yourServerName": "MoguaiTestServer",
+  "welcomeChannelName": "willkommen",
+  "welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",
+  "roles": [
+    {
+      "icon": "🤠",
+      "roleName": "tank",
+      "roleSetText": " ist jetzt Tank",
+      "roleRemoveText": " ist jetzt kein Tank mehr"
+    },
+    {
+      "icon": "🤖",
+      "roleName": "heal",
+      "roleSetText": " ist jetzt Heal",
+      "roleRemoveText": " ist jetzt kein Heal mehr"
+    },
+    {
+      "icon": "☠",
+      "roleName": "dd",
+      "roleSetText": " ist jetzt DD",
+      "roleRemoveText": " ist jetzt kein DD mehr"
+    }
+  ],
+  "serverMessages": [
+    {
+      "reactMessage": "ping",
+      "botAnswer": "pong"
+    }
+  ]
+}

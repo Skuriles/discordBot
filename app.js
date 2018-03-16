@@ -3,6 +3,7 @@ const fs = require("fs");
 const private = require("./private");
 const jsonfile = require("jsonfile");
 const fileName = "./messageFiles/welcome.json";
+const configFile = "./configuration.json";
 
 // Create an instance of a Discord client
 const client = new Discord.Client();
@@ -11,6 +12,7 @@ const client = new Discord.Client();
 const token = private.botToken;
 
 let roleMessageId = null;
+let config = null;
 // The ready event is vital, it means that your bot will only start reacting to information
 // from Discord _after_ ready is emitted
 client.on("ready", () => {
@@ -21,9 +23,16 @@ client.on("ready", () => {
       roleMessageId = obj.messageId;
     }
   });
-  const guild = client.guilds.find("name", "MoguaiTestServer");
+  jsonfile.readFile(configFile, function(err, obj) {
+    if (err) {
+      console.log("No config file");
+    } else {
+      config = obj;
+    }
+  });
+  const guild = client.guilds.find("name", config.yourServerName);
   const channels = guild.channels;
-  const welcomeChannel = channels.find("name", "willkommen");
+  const welcomeChannel = channels.find("name", config.welcomeChannelName);
   if (welcomeChannel) {
     welcomeChannel.fetchPinnedMessages().then((stickies) => {
       if (stickies) {
@@ -34,7 +43,7 @@ client.on("ready", () => {
       }
     });
   } else {
-    guild.createChannel("willkommen").then((newWelcomeChannel) => {
+    guild.createChannel(config.welcomeChannelName).then((newWelcomeChannel) => {
       sendWelcomeMessage(newWelcomeChannel);
     });
   }
@@ -42,40 +51,30 @@ client.on("ready", () => {
 });
 
 const sendWelcomeMessage = (welcomeChannel) => {
-  welcomeChannel
-    .send("Herzlich willkommen, wähle deine Rolle!")
-    .then((newMessage) => {
-      newMessage.pin().then((myMessage) => {
-        //newMessage.delete();
-        roleMessageId = myMessage.id;
-        jsonfile.writeFile(fileName, { messageId: roleMessageId }, (err) => {
-          if (err) {
-            console.error(err);
-          }
-        });
-        myMessage.react("🤠");
-        myMessage.react("☠");
-        myMessage.react("🤖");
-        const filter = (reaction, user) => reaction.emoji.name === "🤠";
-        //const filter = (reaction, user) => ({});
-        myMessage
-          .awaitReactions(filter, { time: 100000 })
-          .then((collected) => {
-            console.log("got reaction");
-          })
-          .catch((collected) => {
-            console.log("error reaction");
-          });
+  welcomeChannel.send(welcomeChannelText).then((newMessage) => {
+    newMessage.pin().then((myMessage) => {
+      //newMessage.delete();
+      roleMessageId = myMessage.id;
+      jsonfile.writeFile(fileName, { messageId: roleMessageId }, (err) => {
+        if (err) {
+          console.error(err);
+        }
       });
+      for (const role of config.roles) {
+        myMessage.react(role.icon);
+      }
     });
+  });
 };
 
 // Create an event listener for messages
 client.on("message", (message) => {
-  // If the message is "ping"
-  if (message.content === "ping") {
-    // Send "pong" to the same channel
-    message.channel.send("pong");
+  for (const msg of config.serverMessages) {
+    if (message.content === msg.reactMessage) {
+      // Send "pong" to the same channel
+      message.channel.send(msg.botAnswer);
+    }
+    break;
   }
   if (message.content === "what is my avatar") {
     // Send the user's avatar URL
