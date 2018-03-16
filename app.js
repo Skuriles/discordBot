@@ -29,32 +29,40 @@ client.on("ready", () => {
     } else {
       config = obj;
       const guild = client.guilds.find("name", config.yourServerName);
-      for (const role of config.roles) {
-        const roleExist = guild.roles.find("name", role.roleName);
-        if (!roleExist) {
-          guild.createRole({
-            name: role.roleName,
-            color: role.color
-          });
-        }
-      }
-      const channels = guild.channels;
-      const welcomeChannel = channels.find("name", config.welcomeChannelName);
-      if (welcomeChannel) {
-        welcomeChannel.fetchPinnedMessages().then(stickies => {
-          if (stickies) {
-            const welcomeMessage = stickies.find("id", roleMessageId);
-            if (!welcomeMessage) {
-              sendWelcomeMessage(welcomeChannel);
-            }
+      if (guild) {
+        for (const role of config.roles) {
+          const roleExist = guild.roles.find("name", role.roleName);
+          if (!roleExist) {
+            guild.createRole({
+              name: role.roleName,
+              color: role.color
+            });
           }
-        });
-      } else {
-        guild
-          .createChannel(config.welcomeChannelName)
-          .then(newWelcomeChannel => {
-            sendWelcomeMessage(newWelcomeChannel);
+        }
+        const channels = guild.channels;
+        const welcomeChannel = channels.find("name", config.welcomeChannelName);
+        if (welcomeChannel) {
+          welcomeChannel.fetchPinnedMessages().then(stickies => {
+            if (stickies) {
+              const welcomeMessage = stickies.find("id", roleMessageId);
+              if (!welcomeMessage) {
+                sendWelcomeMessage(welcomeChannel);
+              }
+            }
           });
+        } else {
+          guild
+            .createChannel(config.welcomeChannelName)
+            .then(newWelcomeChannel => {
+              sendWelcomeMessage(newWelcomeChannel);
+            });
+        }
+      } else {
+        console.log(
+          "Can't find " +
+            config.yourServerName +
+            "! Check if configuration.json is configured properly and Bot is assigend to this Server"
+        );
       }
       console.log("I am ready!");
     }
