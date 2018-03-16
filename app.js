@@ -62,7 +62,7 @@ client.on("ready", () => {
 });
 
 const sendWelcomeMessage = welcomeChannel => {
-  welcomeChannel.send(welcomeChannelText).then(newMessage => {
+  welcomeChannel.send(config.welcomeChannelText).then(newMessage => {
     newMessage.pin().then(myMessage => {
       //newMessage.delete();
       roleMessageId = myMessage.id;
