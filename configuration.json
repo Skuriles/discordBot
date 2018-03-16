@@ -7,19 +7,22 @@
       "icon": "🤠",
       "roleName": "tank",
       "roleSetText": " ist jetzt Tank",
-      "roleRemoveText": " ist jetzt kein Tank mehr"
+      "roleRemoveText": " ist jetzt kein Tank mehr",
+      "color": "BLUE"
     },
     {
       "icon": "🤖",
       "roleName": "heal",
       "roleSetText": " ist jetzt Heal",
-      "roleRemoveText": " ist jetzt kein Heal mehr"
+      "roleRemoveText": " ist jetzt kein Heal mehr",
+      "color": "GREEN"
     },
     {
       "icon": "☠",
       "roleName": "dd",
       "roleSetText": " ist jetzt DD",
-      "roleRemoveText": " ist jetzt kein DD mehr"
+      "roleRemoveText": " ist jetzt kein DD mehr",
+      "color": "YELLOW"
     }
   ],
   "serverMessages": [

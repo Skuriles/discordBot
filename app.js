@@ -28,34 +28,45 @@ client.on("ready", () => {
       console.log("No config file");
     } else {
       config = obj;
-    }
-  });
-  const guild = client.guilds.find("name", config.yourServerName);
-  const channels = guild.channels;
-  const welcomeChannel = channels.find("name", config.welcomeChannelName);
-  if (welcomeChannel) {
-    welcomeChannel.fetchPinnedMessages().then((stickies) => {
-      if (stickies) {
-        const welcomeMessage = stickies.find("id", roleMessageId);
-        if (!welcomeMessage) {
-          sendWelcomeMessage(welcomeChannel);
+      const guild = client.guilds.find("name", config.yourServerName);
+      for (const role of config.roles) {
+        const roleExist = guild.roles.find("name", role.roleName);
+        if (!roleExist) {
+          guild.createRole({
+            name: role.roleName,
+            color: role.color
+          });
         }
       }
-    });
-  } else {
-    guild.createChannel(config.welcomeChannelName).then((newWelcomeChannel) => {
-      sendWelcomeMessage(newWelcomeChannel);
-    });
-  }
-  console.log("I am ready!");
+      const channels = guild.channels;
+      const welcomeChannel = channels.find("name", config.welcomeChannelName);
+      if (welcomeChannel) {
+        welcomeChannel.fetchPinnedMessages().then(stickies => {
+          if (stickies) {
+            const welcomeMessage = stickies.find("id", roleMessageId);
+            if (!welcomeMessage) {
+              sendWelcomeMessage(welcomeChannel);
+            }
+          }
+        });
+      } else {
+        guild
+          .createChannel(config.welcomeChannelName)
+          .then(newWelcomeChannel => {
+            sendWelcomeMessage(newWelcomeChannel);
+          });
+      }
+      console.log("I am ready!");
+    }
+  });
 });
 
-const sendWelcomeMessage = (welcomeChannel) => {
-  welcomeChannel.send(welcomeChannelText).then((newMessage) => {
-    newMessage.pin().then((myMessage) => {
+const sendWelcomeMessage = welcomeChannel => {
+  welcomeChannel.send(welcomeChannelText).then(newMessage => {
+    newMessage.pin().then(myMessage => {
       //newMessage.delete();
       roleMessageId = myMessage.id;
-      jsonfile.writeFile(fileName, { messageId: roleMessageId }, (err) => {
+      jsonfile.writeFile(fileName, { messageId: roleMessageId }, err => {
         if (err) {
           console.error(err);
         }
@@ -68,7 +79,7 @@ const sendWelcomeMessage = (welcomeChannel) => {
 };
 
 // Create an event listener for messages
-client.on("message", (message) => {
+client.on("message", message => {
   for (const msg of config.serverMessages) {
     if (message.content === msg.reactMessage) {
       // Send "pong" to the same channel
@@ -85,39 +96,15 @@ client.on("message", (message) => {
 client.on("messageReactionAdd", (reaction, user) => {
   if (!user.bot && reaction.message.id === roleMessageId) {
     const roleUser = reaction.message.guild.members.get(user.id);
-    const tankRole = roleUser.guild.roles.find("name", "tank");
-    const healRole = roleUser.guild.roles.find("name", "heal");
-    const ddRole = roleUser.guild.roles.find("name", "dd");
-    const test = roleUser.roles;
-    switch (reaction.emoji.name) {
-      case "🤠":
-        roleUser.addRole(tankRole.id);
+    for (const role of config.roles) {
+      if (role.icon === reaction.emoji.name) {
+        roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
         reaction.message.channel
-          .send("User " + user.username + " ist jetzt Tank")
-          .then((msg) => {
+          .send(user.username + role.roleSetText)
+          .then(msg => {
             msg.delete(15000);
           });
-        break;
-      case "☠":
-        roleUser.addRole(ddRole.id);
-        reaction.message.channel
-          .send("User " + user.username + " ist jetzt DD")
-          .then((msg) => {
-            msg.delete(15000);
-          });
-        break;
-        break;
-      case "🤖":
-        roleUser.addRole(healRole.id);
-        reaction.message.channel
-          .send("User " + user.username + " ist jetzt Heal")
-          .then((msg) => {
-            msg.delete(15000);
-          });
-        break;
-        break;
-      default:
-        break;
+      }
     }
   }
 });
@@ -125,39 +112,15 @@ client.on("messageReactionAdd", (reaction, user) => {
 client.on("messageReactionRemove", (reaction, user) => {
   if (!user.bot && reaction.message.id === roleMessageId) {
     const roleUser = reaction.message.guild.members.get(user.id);
-    const tankRole = roleUser.guild.roles.find("name", "tank");
-    const healRole = roleUser.guild.roles.find("name", "heal");
-    const ddRole = roleUser.guild.roles.find("name", "dd");
-    const test = roleUser.roles;
-    switch (reaction.emoji.name) {
-      case "🤠":
-        roleUser.removeRole(tankRole.id);
+    for (const role of config.roles) {
+      if (role.icon === reaction.emoji.name) {
+        roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
         reaction.message.channel
-          .send("User " + user.username + " ist jetzt kein Tank mehr")
-          .then((msg) => {
+          .send(user.username + role.roleRemoveText)
+          .then(msg => {
             msg.delete(15000);
           });
-        break;
-      case "☠":
-        roleUser.removeRole(ddRole.id);
-        reaction.message.channel
-          .send("User " + user.username + " ist jetzt kein DD mehr")
-          .then((msg) => {
-            msg.delete(15000);
-          });
-        break;
-        break;
-      case "🤖":
-        roleUser.removeRole(healRole.id);
-        reaction.message.channel
-          .send("User " + user.username + " ist jetzt kein Heal mehr")
-          .then((msg) => {
-            msg.delete(15000);
-          });
-        break;
-        break;
-      default:
-        break;
+      }
     }
   }
 });
