@@ -10,7 +10,7 @@
     };
 ```
 
-4.  Replace all icons and role names according to your wishes in code
+4.  Configure configuration.json to your wishes (roles will be automatically added on bot start if they not already exist)
 5.  Do "node app.js"
 
 Bot needs the following rights:
