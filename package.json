@@ -2,9 +2,12 @@
   "name": "moguaisrolebot",
   "description": "MoguaiTestBot",
   "version": "1.0.0",
-  "scripts": { "start": "node server.js" },
+  "scripts": {
+    "start": "node server.js"
+  },
   "dependencies": {
     "discord.js": "github:hydrabolt/discord.js#11.3-dev",
+    "dotenv": "^5.0.1",
     "jsonfile": "^4.0.0"
   }
 }
