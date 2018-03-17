@@ -2,12 +2,10 @@
 
 1.  Download Code
 2.  Do "npm install" in root folder
-3.  Create a private.js file in root with content:
+3.  Create a ".env" file in root with content:
 
 ```
-    module.exports = {
-    botToken: "YOUR BOT TOKEN"
-    };
+   BOTTOKEN=<YOUR BOT TOKEN>
 ```
 
 4.  Configure configuration.json to your wishes (roles will be automatically added on bot start if they not already exist)

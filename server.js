@@ -1,6 +1,6 @@
 const Discord = require("discord.js");
 const fs = require("fs");
-require('dotenv').config()
+require("dotenv").config();
 const jsonfile = require("jsonfile");
 const fileName = "./messageFiles/welcome.json";
 const configFile = "./configuration.json";
