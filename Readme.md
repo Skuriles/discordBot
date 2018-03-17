@@ -24,12 +24,14 @@
         ],
         ``` 
         => List of roles of the bot. The roles will be created with default rights if they don't exist. For roleSetText and roleRemoveText you can use "[username]" tag which will be replaced by the the nam of the user
-    5. ```"serverMessages": [
+    5. ```
+    "serverMessages": [
             {
             "reactMessage": "ping",
             "botAnswer": "pong"
             }
-        ]```
+        ]
+        ```
         => List of serverMessages the bot can post. (Maybe will be extended in future versions)
 
 
