@@ -1,5 +1,7 @@
 {
+  "name": "moguaisrolebot",
   "description": "MoguaiTestBot",
+  "version": "1.0.0",
   "dependencies": {
     "discord.js": "github:hydrabolt/discord.js#11.3-dev",
     "jsonfile": "^4.0.0"

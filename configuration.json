@@ -1,27 +1,27 @@
 {
-  "yourServerName": "MoguaiTestServer",
+  "yourServerNames": ["MoguaiTestServer"],
   "welcomeChannelName": "willkommen",
   "welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",
   "roles": [
     {
       "icon": "🤠",
       "roleName": "tank",
-      "roleSetText": " ist jetzt Tank",
-      "roleRemoveText": " ist jetzt kein Tank mehr",
+      "roleSetText": "[username] ist jetzt Tank",
+      "roleRemoveText": "[username] ist jetzt kein Tank mehr",
       "color": "BLUE"
     },
     {
       "icon": "🤖",
       "roleName": "heal",
-      "roleSetText": " ist jetzt Heal",
-      "roleRemoveText": " ist jetzt kein Heal mehr",
+      "roleSetText": "[username] ist jetzt Heal",
+      "roleRemoveText": "[username] ist jetzt kein Heal mehr",
       "color": "GREEN"
     },
     {
       "icon": "☠",
       "roleName": "dd",
-      "roleSetText": " ist jetzt DD",
-      "roleRemoveText": " ist jetzt kein DD mehr",
+      "roleSetText": "[username] ist jetzt DD",
+      "roleRemoveText": "[username] ist jetzt kein DD mehr",
       "color": "YELLOW"
     }
   ],
