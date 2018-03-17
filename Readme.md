@@ -12,7 +12,8 @@
     1. ```"yourServerNames": ["Servername"]``` => List of Guilds (Server) the bot is running on.
     2. ```"welcomeChannelName": "willkommen",``` => Name of channel the bot creates if it does not already exist and where it posts it's role message
     3. ```"welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",``` => Text of the welcome message 
-    4. ```"roles": [
+    4. ```
+        "roles": [
         {
             "icon": "🤠",
             "roleName": "tank",
@@ -20,7 +21,8 @@
             "roleRemoveText": "[username] ist jetzt kein Tank mehr",
             "color": "BLUE"
             }..
-        ],``` 
+        ],
+        ``` 
         => List of roles of the bot. The roles will be created with default rights if they don't exist. For roleSetText and roleRemoveText you can use "[username]" tag which will be replaced by the the nam of the user
     5. ```"serverMessages": [
             {
