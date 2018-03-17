@@ -12,7 +12,7 @@
     1. ```"yourServerNames": ["Servername"]``` => List of Guilds (Server) the bot is running on.
     2. ```"welcomeChannelName": "willkommen",``` => Name of channel the bot creates if it does not already exist and where it posts it's role message
     3. ```"welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",``` => Text of the welcome message 
-    4.```"roles": [
+    4. ```"roles": [
         {
             "icon": "🤠",
             "roleName": "tank",
