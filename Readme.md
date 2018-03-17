@@ -29,7 +29,8 @@
             "botAnswer": "pong"
             }
         ]
-        ```=> List of serverMessages the bot can post. (Maybe will be extended in future versions)
+        ```
+        => List of serverMessages the bot can post. (Maybe will be extended in future versions)
 5.  Do ```node server.js```
 
 Bot needs the following rights:
