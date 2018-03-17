@@ -9,11 +9,11 @@
 ```
 
 4.  Configure configuration.json to your wishes (roles will be automatically added on bot start if they not already exist)
-    1. ```"yourServerNames": ["Servername"]``` => List of Guilds (Server) the bot is running on.
-    2. ```"welcomeChannelName": "willkommen",``` => Name of channel the bot creates if it does not already exist and where it posts it's role message
-    3. ```"welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",``` => Text of the welcome message 
-    4. ```
-        "roles": [
+    1. ```json"yourServerNames": ["Servername"]``` => List of Guilds (Server) the bot is running on.
+    2. ```json"welcomeChannelName": "willkommen",``` => Name of channel the bot creates if it does not already exist and where it posts it's role message
+    3. ```json"welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",``` => Text of the welcome message 
+    4. ```json
+    "roles": [
         {
             "icon": "🤠",
             "roleName": "tank",
@@ -22,9 +22,9 @@
             "color": "BLUE"
             }..
         ],
-        ``` 
+    ``` 
         => List of roles of the bot. The roles will be created with default rights if they don't exist. For roleSetText and roleRemoveText you can use "[username]" tag which will be replaced by the the nam of the user
-    5. ```
+    5. ```json
     "serverMessages": [
             {
             "reactMessage": "ping",
