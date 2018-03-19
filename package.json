@@ -6,7 +6,7 @@
     "start": "node server.js"
   },
   "dependencies": {
-    "discord.js": "github:hydrabolt/discord.js#11.3-dev",
+    "discord.js": "^11.3.2",
     "dotenv": "^5.0.1",
     "jsonfile": "^4.0.0"
   }
