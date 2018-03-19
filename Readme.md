@@ -44,8 +44,9 @@ Bot needs the following rights:
 Where can I run my bot?
 
 1.  You can host the bot on any server or on a webhoster which has node.js > V8.0.0 installed. For german speaking people wiht some knowledge in Linux Terminal (or want to learn it) I prefer https://uberspace.de.
-2.  A free hosting solution would be Glitch.com
+2.  A free hosting solution would be Glitch.com (no guarantee for security issues from my side!)
     1.  Small guide https://www.google.de/search?q=host+a+bot+on+glitch%2Ccom&oq=host+a+bot+on+glitch%2Ccom&aqs=chrome..69i57.5619j0j9&sourceid=chrome&ie=UTF-8
+    2.  Don't forget to switch the project to "private", otherwise everyone can modify your bot code which is not recommended.
 3.  Easiest way to run the bot on glitch.com is to create an account (or login with Github if you have an account), start a new project, open "Project options" in the top left corner, go to "Advanced Options" => "Import from Github", enter the name of this repository "Skuriles/discordBot" and import the current version of the bot. Then add the `.env` file and modifiy the `configuration.json` to your wishes as described above. On every change on a file Glitch will try to restart the Bot. So don't wonder if there are some errors at the beginning. If you are finished, to restart your bot you can simply modify a file (e.g. add or a remove a space), as there is not start/stop functionality in glitch.com
 
 Additional information regarding Emojis:
