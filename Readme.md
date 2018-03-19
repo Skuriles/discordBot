@@ -1,7 +1,7 @@
 # How To
 
 1.  Download Code
-2.  Do ```npm install``` in root folder
+2.  Do `npm install` in root folder
 3.  Create a ".env" file in root with content:
 
 ```
@@ -9,10 +9,10 @@
 ```
 
 4.  Configure configuration.json to your wishes (roles will be automatically added on bot start if they not already exist)
-    1. ```"yourServerNames": ["Servername"]``` => List of Guilds (Server) the bot is running on.
-    2. ```"welcomeChannelName": "willkommen",``` => Name of channel the bot creates if it does not already exist and where it posts it's role message
-    3. ```"welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",``` => Text of the welcome message 
-    4. ```"roles": [
+    1.  `"yourServerNames": ["Servername"]` => List of Guilds (Server) the bot is running on.
+    2.  `"welcomeChannelName": "willkommen",` => Name of channel the bot creates if it does not already exist and where it posts it's role message
+    3.  `"welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",` => Text of the welcome message
+    4.  ```"roles": [
         {
             "icon": "🤠",
             "roleName": "tank",
@@ -21,9 +21,9 @@
             "color": "BLUE"
             }..
         ],
-        ``` 
+        ```
         => List of roles of the bot. The roles will be created with default rights if they don't exist. For roleSetText and roleRemoveText you can use "[username]" tag which will be replaced by the the nam of the user
-    5. ```"serverMessages": [
+    5.  ```"serverMessages": [
             {
             "reactMessage": "ping",
             "botAnswer": "pong"
@@ -31,7 +31,8 @@
         ]
         ```
         => List of serverMessages the bot can post. (Maybe will be extended in future versions)
-5.  Do ```node server.js```
+5.  Be sure that the bot is assigned to server (guild) and has the role rights from below before starting the bot. Otherwise it could lead to a crash.
+6.  To start the bot write `node server.js` in the root of your bot folder
 
 Bot needs the following rights:
 
@@ -39,6 +40,13 @@ Bot needs the following rights:
 2.  Send Messages
 3.  Manage Messages (to create pin/sticky messages)
 4.  Bot role must be higher than the roles he provides
+
+Where can I run my bot?
+
+1.  You can host the bot on any server or on a webhoster which has node.js > V8.0.0 installed. For german speaking people wiht some knowledge in Linux Terminal (or want to learn it) I prefer https://uberspace.de.
+2.  A free hosting solution would be Glitch.com
+    1.  Small guide https://www.google.de/search?q=host+a+bot+on+glitch%2Ccom&oq=host+a+bot+on+glitch%2Ccom&aqs=chrome..69i57.5619j0j9&sourceid=chrome&ie=UTF-8
+3.  Easiest way to run the bot on glitch.com is to create an account (or login with Github if you have an account), start a new project, open "Project options" in the top left corner, go to "Advanced Options" => "Import from Github", enter the name of this repository "Skuriles/discordBot" and import the current version of the bot. Then add the `.env` file and modifiy the `configuration.json` to your wishes as described above. On every change on a file Glitch will try to restart the Bot. So don't wonder if there are some errors at the beginning. If you are finished, to restart your bot you can simply modify a file (e.g. add or a remove a space), as there is not start/stop functionality in glitch.com
 
 Additional information regarding Emojis:
 Some code editors (e.g. VS Code) can show the emoji graphics by default if you copy them directly form browser (e.g. form here https://unicode.org/emoji/charts/full-emoji-list.html).

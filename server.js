@@ -46,7 +46,7 @@ client.on("ready", () => {
             config.welcomeChannelName
           );
           if (welcomeChannel) {
-            welcomeChannel.fetchPinnedMessages().then(stickies => {
+            welcomeChannel.fetchPinnedMessages().then((stickies) => {
               if (stickies) {
                 let roleMessageId = getRoleMessageId(guild.id);
                 if (!roleMessageId || !stickies.find("id", roleMessageId)) {
@@ -57,7 +57,7 @@ client.on("ready", () => {
           } else {
             guild
               .createChannel(config.welcomeChannelName)
-              .then(newWelcomeChannel => {
+              .then((newWelcomeChannel) => {
                 sendWelcomeMessage(newWelcomeChannel);
               });
           }
@@ -74,7 +74,21 @@ client.on("ready", () => {
   });
 });
 
-const getRoleMessageId = guildId => {
+client.on("guildDelete", (guild) => {
+  roleMessages.forEach((ele, index) => {
+    if (ele.guildId === guild.id) {
+      roleMessages.splice(index, 1);
+      jsonfile.writeFile(fileName, roleMessages, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        return;
+      });
+    }
+  });
+});
+
+const getRoleMessageId = (guildId) => {
   for (const msg of roleMessages) {
     if (msg.guildId === guildId) {
       return msg.messageId;
@@ -83,9 +97,9 @@ const getRoleMessageId = guildId => {
   return null;
 };
 
-const sendWelcomeMessage = welcomeChannel => {
-  welcomeChannel.send(config.welcomeChannelText).then(newMessage => {
-    newMessage.pin().then(myMessage => {
+const sendWelcomeMessage = (welcomeChannel) => {
+  welcomeChannel.send(config.welcomeChannelText).then((newMessage) => {
+    newMessage.pin().then((myMessage) => {
       let found = false;
       for (const roleMsg of roleMessages) {
         if (roleMsg.guildId === myMessage.guild.id) {
@@ -100,7 +114,7 @@ const sendWelcomeMessage = welcomeChannel => {
           guildId: welcomeChannel.guild.id
         });
       }
-      jsonfile.writeFile(fileName, roleMessages, err => {
+      jsonfile.writeFile(fileName, roleMessages, (err) => {
         if (err) {
           console.error(err);
         }
@@ -113,7 +127,7 @@ const sendWelcomeMessage = welcomeChannel => {
 };
 
 // Create an event listener for messages
-client.on("message", message => {
+client.on("message", (message) => {
   for (const msg of config.serverMessages) {
     if (message.content === msg.reactMessage) {
       // send answer from configuration json
@@ -137,7 +151,7 @@ client.on("messageReactionAdd", (reaction, user) => {
       if (role.icon === reaction.emoji.name) {
         roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
         const msgText = role.roleSetText.replace("[username]", user.username);
-        reaction.message.channel.send(msgText).then(msg => {
+        reaction.message.channel.send(msgText).then((msg) => {
           msg.delete(15000);
         });
       }
@@ -158,7 +172,7 @@ client.on("messageReactionRemove", (reaction, user) => {
           "[username]",
           user.username
         );
-        reaction.message.channel.send(msgText).then(msg => {
+        reaction.message.channel.send(msgText).then((msg) => {
           msg.delete(15000);
         });
       }
