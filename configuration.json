@@ -1,28 +1,44 @@
 {
   "yourServerNames": ["MoguaiTestServer"],
   "welcomeChannelName": "willkommen",
-  "welcomeChannelText": "Herzlich willkommen, wähle deine Rolle!",
-  "roles": [
+  "welcomeChannelText": [
     {
-      "icon": "🤠",
-      "roleName": "tank",
-      "roleSetText": "[username] ist jetzt Tank",
-      "roleRemoveText": "[username] ist jetzt kein Tank mehr",
-      "color": "BLUE"
+      "text": "Herzlich willkommen, wähle deine Rolle!",
+      "roles": [
+        {
+          "icon": "🤠",
+          "roleName": "tank",
+          "roleSetText": "[username] ist jetzt Tank",
+          "roleRemoveText": "[username] ist jetzt kein Tank mehr",
+          "color": "BLUE"
+        },
+        {
+          "icon": "🤖",
+          "roleName": "heal",
+          "roleSetText": "[username] ist jetzt Heal",
+          "roleRemoveText": "[username] ist jetzt kein Heal mehr",
+          "color": "GREEN"
+        },
+        {
+          "icon": "☠",
+          "roleName": "dd",
+          "roleSetText": "[username] ist jetzt DD",
+          "roleRemoveText": "[username] ist jetzt kein DD mehr",
+          "color": "YELLOW"
+        }
+      ]
     },
     {
-      "icon": "🤖",
-      "roleName": "heal",
-      "roleSetText": "[username] ist jetzt Heal",
-      "roleRemoveText": "[username] ist jetzt kein Heal mehr",
-      "color": "GREEN"
-    },
-    {
-      "icon": "☠",
-      "roleName": "dd",
-      "roleSetText": "[username] ist jetzt DD",
-      "roleRemoveText": "[username] ist jetzt kein DD mehr",
-      "color": "YELLOW"
+      "text": "Neue Nachricht",
+      "roles": [
+        {
+          "icon": "😁",
+          "roleName": "test",
+          "roleSetText": "[username] ist jetzt Test",
+          "roleRemoveText": "[username] ist jetzt kein Test mehr",
+          "color": "GREEN"
+        }
+      ]
     }
   ],
   "serverMessages": [

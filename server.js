@@ -31,13 +31,15 @@ client.on("ready", () => {
       for (const configGuild of config.yourServerNames) {
         const guild = client.guilds.find("name", configGuild);
         if (guild) {
-          for (const role of config.roles) {
-            const roleExist = guild.roles.find("name", role.roleName);
-            if (!roleExist) {
-              guild.createRole({
-                name: role.roleName,
-                color: role.color
-              });
+          for (const welcomeText of config.welcomeChannelText) {
+            for (const role of welcomeText.roles) {
+              const roleExist = guild.roles.find("name", role.roleName);
+              if (!roleExist) {
+                guild.createRole({
+                  name: role.roleName,
+                  color: role.color
+                });
+              }
             }
           }
           const channels = guild.channels;
@@ -48,9 +50,14 @@ client.on("ready", () => {
           if (welcomeChannel) {
             welcomeChannel.fetchPinnedMessages().then((stickies) => {
               if (stickies) {
-                let roleMessageId = getRoleMessageId(guild.id);
-                if (!roleMessageId || !stickies.find("id", roleMessageId)) {
-                  sendWelcomeMessage(welcomeChannel);
+                let roleMessageIds = getRoleMessageIds(guild.id);
+                if (
+                  !roleMessageIds ||
+                  !stickies.find("id", roleMessageIds[0])
+                ) {
+                  for (const msg of config.welcomeChannelText) {
+                    sendWelcomeMessage(welcomeChannel, msg);
+                  }
                 }
               }
             });
@@ -58,7 +65,9 @@ client.on("ready", () => {
             guild
               .createChannel(config.welcomeChannelName)
               .then((newWelcomeChannel) => {
-                sendWelcomeMessage(newWelcomeChannel);
+                for (const msg of config.welcomeChannelText) {
+                  sendWelcomeMessage(newWelcomeChannel, msg);
+                }
               });
           }
         } else {
@@ -88,38 +97,62 @@ client.on("guildDelete", (guild) => {
   });
 });
 
-const getRoleMessageId = (guildId) => {
+const getRoleMessageIds = (guildId) => {
   for (const msg of roleMessages) {
     if (msg.guildId === guildId) {
-      return msg.messageId;
+      return msg.messages;
     }
   }
   return null;
 };
 
-const sendWelcomeMessage = (welcomeChannel) => {
-  welcomeChannel.send(config.welcomeChannelText).then((newMessage) => {
+const roleMessageExist = (guildId, messageId) => {
+  for (const msg of roleMessages) {
+    if (msg.guildId === guildId) {
+      for (const msgId of msg.messages) {
+        if (messageId === msgId) {
+          return true;
+        }
+      }
+    }
+  }
+  return false;
+};
+
+const sendWelcomeMessage = (welcomeChannel, msg) => {
+  welcomeChannel.send(msg.text).then((newMessage) => {
     newMessage.pin().then((myMessage) => {
       let found = false;
+      let guildFound = false;
+      let messageToAddGuild = null;
       for (const roleMsg of roleMessages) {
         if (roleMsg.guildId === myMessage.guild.id) {
-          roleMsg.messageId = myMessage.id;
-          found = true;
-          break;
+          guildFound = true;
+          messageToAddGuild = roleMsg;
+          for (const roleMsgId of roleMsg.messages) {
+            if (roleMsgId === myMessage.id) {
+              found = true;
+              break;
+            }
+          }
         }
       }
       if (!found) {
-        roleMessages.push({
-          messageId: myMessage.id,
-          guildId: welcomeChannel.guild.id
-        });
+        if (!guildFound) {
+          roleMessages.push({
+            messages: [myMessage.id],
+            guildId: welcomeChannel.guild.id
+          });
+        } else {
+          messageToAddGuild.messages.push(myMessage.id);
+        }
       }
       jsonfile.writeFile(fileName, roleMessages, (err) => {
         if (err) {
           console.error(err);
         }
       });
-      for (const role of config.roles) {
+      for (const role of msg.roles) {
         myMessage.react(role.icon);
       }
     });
@@ -128,6 +161,28 @@ const sendWelcomeMessage = (welcomeChannel) => {
 
 // Create an event listener for messages
 client.on("message", (message) => {
+  if (message.content.startsWith("!editBotMessage")) {
+    // TODO change this to "placeholder [15]"
+    const num = parseInt(message.content.charAt(15));
+    if (num && num > 0) {
+      const ids = getRoleMessageIds(message.guild.id);
+      const channels = message.guild.channels;
+      const welcomeChannel = channels.find("name", config.welcomeChannelName);
+      if (welcomeChannel) {
+        welcomeChannel.fetchPinnedMessages().then((stickies) => {
+          if (stickies) {
+            const stickyMsg = stickies.find("id", ids[num]);
+            if (stickyMsg) {
+              stickyMsg
+                .edit(message.content.substr(17, message.content.length - 1))
+                .then((msg) => console.log(`New message content: ${msg}`))
+                .catch(console.error);
+            }
+          }
+        });
+      }
+    }
+  }
   for (const msg of config.serverMessages) {
     if (message.content === msg.reactMessage) {
       // send answer from configuration json
@@ -144,16 +199,18 @@ client.on("message", (message) => {
 client.on("messageReactionAdd", (reaction, user) => {
   if (
     !user.bot &&
-    getRoleMessageId(reaction.message.guild.id) === reaction.message.id
+    roleMessageExist(reaction.message.guild.id, reaction.message.id)
   ) {
     const roleUser = reaction.message.guild.members.get(user.id);
-    for (const role of config.roles) {
-      if (role.icon === reaction.emoji.name) {
-        roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
-        const msgText = role.roleSetText.replace("[username]", user.username);
-        reaction.message.channel.send(msgText).then((msg) => {
-          msg.delete(15000);
-        });
+    for (const welcomeText of config.welcomeChannelText) {
+      for (const role of welcomeText.roles) {
+        if (role.icon === reaction.emoji.name) {
+          roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
+          const msgText = role.roleSetText.replace("[username]", user.username);
+          reaction.message.channel.send(msgText).then((msg) => {
+            msg.delete(15000);
+          });
+        }
       }
     }
   }
@@ -162,19 +219,21 @@ client.on("messageReactionAdd", (reaction, user) => {
 client.on("messageReactionRemove", (reaction, user) => {
   if (
     !user.bot &&
-    getRoleMessageId(reaction.message.guild.id) === reaction.message.id
+    roleMessageExist(reaction.message.guild.id, reaction.message.id)
   ) {
     const roleUser = reaction.message.guild.members.get(user.id);
-    for (const role of config.roles) {
-      if (role.icon === reaction.emoji.name) {
-        roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
-        const msgText = role.roleRemoveText.replace(
-          "[username]",
-          user.username
-        );
-        reaction.message.channel.send(msgText).then((msg) => {
-          msg.delete(15000);
-        });
+    for (const welcomeText of config.welcomeChannelText) {
+      for (const role of welcomeText.roles) {
+        if (role.icon === reaction.emoji.name) {
+          roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
+          const msgText = role.roleRemoveText.replace(
+            "[username]",
+            user.username
+          );
+          reaction.message.channel.send(msgText).then((msg) => {
+            msg.delete(15000);
+          });
+        }
       }
     }
   }
