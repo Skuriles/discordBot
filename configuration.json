@@ -1,7 +1,7 @@
 {
   "yourServerNames": ["MoguaiTestServer"],
   "welcomeChannelName": "willkommen",
-  "welcomeChannelText": [
+  "welcomeChannelMessages": [
     {
       "text": "Herzlich willkommen, wähle deine Rolle!",
       "roles": [

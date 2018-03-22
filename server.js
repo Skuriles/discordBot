@@ -31,7 +31,7 @@ client.on("ready", () => {
       for (const configGuild of config.yourServerNames) {
         const guild = client.guilds.find("name", configGuild);
         if (guild) {
-          for (const welcomeText of config.welcomeChannelText) {
+          for (const welcomeText of config.welcomeChannelMessages) {
             for (const role of welcomeText.roles) {
               const roleExist = guild.roles.find("name", role.roleName);
               if (!roleExist) {
@@ -55,7 +55,7 @@ client.on("ready", () => {
                   !roleMessageIds ||
                   !stickies.find("id", roleMessageIds[0])
                 ) {
-                  for (const msg of config.welcomeChannelText) {
+                  for (const msg of config.welcomeChannelMessages) {
                     sendWelcomeMessage(welcomeChannel, msg);
                   }
                 }
@@ -65,7 +65,7 @@ client.on("ready", () => {
             guild
               .createChannel(config.welcomeChannelName)
               .then((newWelcomeChannel) => {
-                for (const msg of config.welcomeChannelText) {
+                for (const msg of config.welcomeChannelMessages) {
                   sendWelcomeMessage(newWelcomeChannel, msg);
                 }
               });
@@ -202,7 +202,7 @@ client.on("messageReactionAdd", (reaction, user) => {
     roleMessageExist(reaction.message.guild.id, reaction.message.id)
   ) {
     const roleUser = reaction.message.guild.members.get(user.id);
-    for (const welcomeText of config.welcomeChannelText) {
+    for (const welcomeText of config.welcomeChannelMessages) {
       for (const role of welcomeText.roles) {
         if (role.icon === reaction.emoji.name) {
           roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
@@ -222,7 +222,7 @@ client.on("messageReactionRemove", (reaction, user) => {
     roleMessageExist(reaction.message.guild.id, reaction.message.id)
   ) {
     const roleUser = reaction.message.guild.members.get(user.id);
-    for (const welcomeText of config.welcomeChannelText) {
+    for (const welcomeText of config.welcomeChannelMessages) {
       for (const role of welcomeText.roles) {
         if (role.icon === reaction.emoji.name) {
           roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
