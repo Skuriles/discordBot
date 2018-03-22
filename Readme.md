@@ -9,12 +9,13 @@
 ```
 
 4.  Configure `configuration.json` to your wishes (roles will be automatically added on bot start if they not already exist)
+
     1.  `"yourServerNames": ["Servername"]` => List of Guilds (Server) the bot is running on.
     2.  `"welcomeChannelName": "willkommen",` => Name of channel the bot creates if it does not already exist and where it posts its role messages
     3.  `"welcomeChannelMessages": [{` => List of welcome messages
 
         1.  `"text": "Herzlich willkommen, wähle deine Rolle!",` => Text of the welcome message
-        2.  ````
+        2.  ```
                 "roles": [
                     {
                         "icon": "🤠",
@@ -27,20 +28,22 @@
                         "text": "message2",
                         "roles: [...more roles]
                     }],
-                ```
+            ```
             => List of roles of the bot. The roles will be created with default rights if they don't exist. For roleSetText and roleRemoveText you can use "[username]" tag which will be replaced by the the name of the user
-            ````
 
-    4.  ```"serverMessages": [
-            {
-            "reactMessage": "ping",
-            "botAnswer": "pong"
-            }
-        ]
+    4.  ```
+        "serverMessages": [
+                {
+                "reactMessage": "ping",
+                "botAnswer": "pong"
+                }
+            ]
         ```
+
         => List of serverMessages the bot can post. (Maybe will be extended in future versions)
-5.  Be sure that the bot is assigned to server (guild) and has the role rights from below before starting the bot. Otherwise it could lead to a crash.
-6.  To start the bot write `node server.js` in the root of your bot folder
+
+5)  Be sure that the bot is assigned to server (guild) and has the role rights from below before starting the bot. Otherwise it could lead to a crash.
+6)  To start the bot write `node server.js` in the root of your bot folder
 
 Bot needs the following rights:
 
