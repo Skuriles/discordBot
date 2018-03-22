@@ -21,64 +21,74 @@ client.on("ready", () => {
       console.log("No file");
     } else {
       roleMessages = obj;
-    }
-  });
-  jsonfile.readFile(configFile, function(err, obj) {
-    if (err) {
-      console.log("No config file");
-    } else {
-      config = obj;
-      for (const configGuild of config.yourServerNames) {
-        const guild = client.guilds.find("name", configGuild);
-        if (guild) {
-          for (const welcomeText of config.welcomeChannelMessages) {
-            for (const role of welcomeText.roles) {
-              const roleExist = guild.roles.find("name", role.roleName);
-              if (!roleExist) {
-                guild.createRole({
-                  name: role.roleName,
-                  color: role.color
-                });
-              }
-            }
-          }
-          const channels = guild.channels;
-          const welcomeChannel = channels.find(
-            "name",
-            config.welcomeChannelName
-          );
-          if (welcomeChannel) {
-            welcomeChannel.fetchPinnedMessages().then((stickies) => {
-              if (stickies) {
-                let roleMessageIds = getRoleMessageIds(guild.id);
-                if (
-                  !roleMessageIds ||
-                  !stickies.find("id", roleMessageIds[0])
-                ) {
-                  for (const msg of config.welcomeChannelMessages) {
-                    sendWelcomeMessage(welcomeChannel, msg);
+      jsonfile.readFile(configFile, function(err, obj) {
+        if (err) {
+          console.log("No config file");
+        } else {
+          config = obj;
+          for (const configGuild of config.yourServerNames) {
+            const guild = client.guilds.find("name", configGuild);
+            if (guild) {
+              for (const welcomeText of config.welcomeChannelMessages) {
+                for (const role of welcomeText.roles) {
+                  const roleExist = guild.roles.find("name", role.roleName);
+                  if (!roleExist) {
+                    guild.createRole({
+                      name: role.roleName,
+                      color: role.color
+                    });
                   }
                 }
               }
-            });
-          } else {
-            guild
-              .createChannel(config.welcomeChannelName)
-              .then((newWelcomeChannel) => {
-                for (const msg of config.welcomeChannelMessages) {
-                  sendWelcomeMessage(newWelcomeChannel, msg);
-                }
-              });
+              const channels = guild.channels;
+              const welcomeChannel = channels.find(
+                "name",
+                config.welcomeChannelName
+              );
+              if (welcomeChannel) {
+                welcomeChannel
+                  .fetchPinnedMessages()
+                  .then((cachedMessages) => {
+                    cachedMessages.forEach(function(cmsg, csmgId) {
+                      cmsg.reactions.forEach(function(reaction, reactionId) {
+                        reaction.fetchUsers();
+                      });
+                    });
+                  })
+                  .catch(console.error);
+                welcomeChannel.fetchPinnedMessages().then((stickies) => {
+                  if (stickies) {
+                    let roleMessageIds = getRoleMessageIds(guild.id);
+                    if (
+                      !roleMessageIds ||
+                      !stickies.find("id", roleMessageIds[0])
+                    ) {
+                      for (const msg of config.welcomeChannelMessages) {
+                        sendWelcomeMessage(welcomeChannel, msg);
+                      }
+                    }
+                  }
+                });
+              } else {
+                guild
+                  .createChannel(config.welcomeChannelName)
+                  .then((newWelcomeChannel) => {
+                    for (const msg of config.welcomeChannelMessages) {
+                      sendWelcomeMessage(newWelcomeChannel, msg);
+                    }
+                  });
+              }
+            } else {
+              console.log(
+                "Can't find " +
+                  configGuild +
+                  "! Check if configuration.json is configured properly and Bot is assigend to this Server"
+              );
+            }
           }
-        } else {
-          console.log(
-            "Can't find " +
-              configGuild +
-              "! Check if configuration.json is configured properly and Bot is assigend to this Server"
-          );
+          console.log("I am ready!");
         }
-      }
-      console.log("I am ready!");
+      });
     }
   });
 });
@@ -161,9 +171,17 @@ const sendWelcomeMessage = (welcomeChannel, msg) => {
 
 // Create an event listener for messages
 client.on("message", (message) => {
-  if (message.content.startsWith("!editBotMessage")) {
-    // TODO change this to "placeholder [15]"
-    const num = parseInt(message.content.charAt(15));
+  if (message.author.bot) {
+    return;
+  }
+  const str = message.content;
+  if (str.startsWith("!editBotMessage")) {
+    const roleUser = message.guild.members.get(message.author.id);
+    if (!roleUser.hasPermission("ADMINISTRATOR ")) {
+      message.channel.sendMessage("Nice try, Mr. Non-Administrator");
+      return;
+    }
+    const num = parseInt(str.substring(str.indexOf("[") + 1, str.indexOf("]")));
     if (num && num > 0) {
       const ids = getRoleMessageIds(message.guild.id);
       const channels = message.guild.channels;
@@ -171,11 +189,19 @@ client.on("message", (message) => {
       if (welcomeChannel) {
         welcomeChannel.fetchPinnedMessages().then((stickies) => {
           if (stickies) {
-            const stickyMsg = stickies.find("id", ids[num]);
+            const stickyMsg = stickies.find("id", ids[num - 1]);
             if (stickyMsg) {
               stickyMsg
-                .edit(message.content.substr(17, message.content.length - 1))
-                .then((msg) => console.log(`New message content: ${msg}`))
+                .edit(str.substr(str.indexOf("]") + 1, str.length - 1))
+                .then((msg) => {
+                  console.log(`New message content: ${msg}`);
+                  welcomeChannel
+                    .fetchMessages()
+                    .then((cachedMessages) =>
+                      console.log(`Received ${messages.size} messages`)
+                    )
+                    .catch(console.error);
+                })
                 .catch(console.error);
             }
           }
@@ -184,13 +210,13 @@ client.on("message", (message) => {
     }
   }
   for (const msg of config.serverMessages) {
-    if (message.content === msg.reactMessage) {
+    if (str === msg.reactMessage) {
       // send answer from configuration json
       message.channel.send(msg.botAnswer);
     }
     break;
   }
-  if (message.content === "what is my avatar") {
+  if (str === "what is my avatar") {
     // Send the user's avatar URL
     message.reply(message.author.avatarURL);
   }
