@@ -86,3 +86,4 @@ The bot can handle three types of emojis:
     Example:
     `"icon": "[id]1293345678120",`
 4.  The server will write a message if the emoji wasn't found => `"Emoji not found"`
+5.  Be sure to use unique emojis for each role (even if they are used for different messages). Otherwise it could cause errors (double assignment etc.)

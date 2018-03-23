@@ -81,7 +81,7 @@ client.on("messageReactionAdd", (reaction, user) => {
     for (const welcomeText of botConfig.welcomeChannelMessages) {
       for (const role of welcomeText.roles) {
         const icon = tools.findEmoji(role.icon, client);
-        if (icon === reaction.emoji.name) {
+        if (icon === reaction.emoji.name || icon.name === reaction.emoji.name) {
           roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
           const msgText = role.roleSetText.replace("[username]", user.username);
           reaction.message.channel.send(msgText).then((msg) => {
@@ -102,7 +102,7 @@ client.on("messageReactionRemove", (reaction, user) => {
     for (const welcomeText of botConfig.welcomeChannelMessages) {
       for (const role of welcomeText.roles) {
         const icon = tools.findEmoji(role.icon, client);
-        if (icon === reaction.emoji.name) {
+        if (icon === reaction.emoji.name || icon.name === reaction.emoji.name) {
           roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
           const msgText = role.roleRemoveText.replace(
             "[username]",
