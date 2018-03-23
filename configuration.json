@@ -20,7 +20,7 @@
           "color": "GREEN"
         },
         {
-          "icon": "☠",
+          "icon": "[id]426715318803759125",
           "roleName": "dd",
           "roleSetText": "[username] ist jetzt DD",
           "roleRemoveText": "[username] ist jetzt kein DD mehr",
@@ -32,7 +32,7 @@
       "text": "Neue Nachricht",
       "roles": [
         {
-          "icon": "😁",
+          "icon": ":bethangry:",
           "roleName": "test",
           "roleSetText": "[username] ist jetzt Test",
           "roleRemoveText": "[username] ist jetzt kein Test mehr",

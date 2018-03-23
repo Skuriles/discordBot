@@ -3,6 +3,7 @@ require("dotenv").config();
 const jsonfile = require("jsonfile");
 const welcomeMessageFile = "./messageFiles/welcome.json";
 const configFile = "./configuration.json";
+const tools = require("./tools");
 
 // Create an instance of a Discord client
 const client = new Discord.Client();
@@ -19,39 +20,24 @@ client.on("ready", () => {
   jsonfile.readFile(welcomeMessageFile, function(err, obj) {
     if (err) {
       console.log("No file");
+      botMessages = [];
     } else {
       botMessages = obj;
-      readConfig();
     }
+    readConfig();
   });
 });
 
 client.on("guildDelete", (guild) => {
-  botMessages.forEach((ele, index) => {
-    if (ele.guildId === guild.id) {
-      botMessages.splice(index, 1);
-      jsonfile.writeFile(welcomeMessageFile, botMessages, (err) => {
-        if (err) {
-          console.error(err);
-        }
-        return;
-      });
-    }
-  });
+  removeBotMessage(guild.id);
+  console.log("Deleted Guild");
 });
 
 client.on("channelDelete", (channel) => {
-  botMessages.forEach((ele, index) => {
-    if (ele.guildId === channel.guild.id) {
-      botMessages.splice(index, 1);
-      jsonfile.writeFile(welcomeMessageFile, botMessages, (err) => {
-        if (err) {
-          console.error(err);
-        }
-        return;
-      });
-    }
-  });
+  if (channel.name === botConfig.welcomeChannelName) {
+    removeBotMessage(channel.guild.id);
+    console.log("Deleted Channel");
+  }
 });
 
 const getRoleMessageIds = (guildId) => {
@@ -61,6 +47,104 @@ const getRoleMessageIds = (guildId) => {
     }
   }
   return null;
+};
+
+// Create an event listener for messages
+client.on("message", (message) => {
+  if (message.author.bot) {
+    return;
+  }
+  const str = message.content;
+  if (str.startsWith("!editBotMessage")) {
+    editBotMessage(message, str);
+    return;
+  }
+  for (const msg of botConfig.serverMessages) {
+    if (str === msg.reactMessage) {
+      // send answer from configuration json
+      message.channel.send(msg.botAnswer);
+    }
+    break;
+  }
+  if (str === "what is my avatar") {
+    // Send the user's avatar URL
+    message.reply(message.author.avatarURL);
+  }
+});
+
+client.on("messageReactionAdd", (reaction, user) => {
+  if (
+    !user.bot &&
+    roleMessageExist(reaction.message.guild.id, reaction.message.id)
+  ) {
+    const roleUser = reaction.message.guild.members.get(user.id);
+    for (const welcomeText of botConfig.welcomeChannelMessages) {
+      for (const role of welcomeText.roles) {
+        const icon = tools.findEmoji(role.icon, client);
+        if (icon === reaction.emoji.name) {
+          roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
+          const msgText = role.roleSetText.replace("[username]", user.username);
+          reaction.message.channel.send(msgText).then((msg) => {
+            msg.delete(15000);
+          });
+        }
+      }
+    }
+  }
+});
+
+client.on("messageReactionRemove", (reaction, user) => {
+  if (
+    !user.bot &&
+    roleMessageExist(reaction.message.guild.id, reaction.message.id)
+  ) {
+    const roleUser = reaction.message.guild.members.get(user.id);
+    for (const welcomeText of botConfig.welcomeChannelMessages) {
+      for (const role of welcomeText.roles) {
+        const icon = tools.findEmoji(role.icon, client);
+        if (icon === reaction.emoji.name) {
+          roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
+          const msgText = role.roleRemoveText.replace(
+            "[username]",
+            user.username
+          );
+          reaction.message.channel.send(msgText).then((msg) => {
+            msg.delete(15000);
+          });
+        }
+      }
+    }
+  }
+});
+
+const editBotMessage = (message, str) => {
+  const roleUser = message.guild.members.get(message.author.id);
+  if (!roleUser.hasPermission("ADMINISTRATOR ")) {
+    message.channel.sendMessage("Nice try, Mr. Non-Administrator");
+    return;
+  }
+  const num = parseInt(str.substring(str.indexOf("[") + 1, str.indexOf("]")));
+  if (num && num > 0) {
+    const ids = getRoleMessageIds(message.guild.id);
+    const channels = message.guild.channels;
+    const welcomeChannel = channels.find("name", botConfig.welcomeChannelName);
+    if (welcomeChannel) {
+      welcomeChannel.fetchPinnedMessages().then((stickies) => {
+        if (stickies) {
+          const stickyMsg = stickies.find("id", ids[num - 1]);
+          if (stickyMsg) {
+            stickyMsg
+              .edit(str.substr(str.indexOf("]") + 1, str.length - 1))
+              .then((msg) => {
+                console.log(`New message content: ${msg}`);
+                fetchCachedMessages(welcomeChannel);
+              })
+              .catch(console.error);
+          }
+        }
+      });
+    }
+  }
 };
 
 const roleMessageExist = (guildId, messageId) => {
@@ -110,110 +194,12 @@ const sendWelcomeMessage = (welcomeChannel, msg) => {
         }
       });
       for (const role of msg.roles) {
-        myMessage.react(role.icon);
+        const icon = tools.findEmoji(role.icon, client);
+        myMessage.react(icon);
       }
     });
   });
 };
-
-// Create an event listener for messages
-client.on("message", (message) => {
-  if (message.author.bot) {
-    return;
-  }
-  const str = message.content;
-  if (str.startsWith("!editBotMessage")) {
-    const roleUser = message.guild.members.get(message.author.id);
-    if (!roleUser.hasPermission("ADMINISTRATOR ")) {
-      message.channel.sendMessage("Nice try, Mr. Non-Administrator");
-      return;
-    }
-    const num = parseInt(str.substring(str.indexOf("[") + 1, str.indexOf("]")));
-    if (num && num > 0) {
-      const ids = getRoleMessageIds(message.guild.id);
-      const channels = message.guild.channels;
-      const welcomeChannel = channels.find(
-        "name",
-        botConfig.welcomeChannelName
-      );
-      if (welcomeChannel) {
-        welcomeChannel.fetchPinnedMessages().then((stickies) => {
-          if (stickies) {
-            const stickyMsg = stickies.find("id", ids[num - 1]);
-            if (stickyMsg) {
-              stickyMsg
-                .edit(str.substr(str.indexOf("]") + 1, str.length - 1))
-                .then((msg) => {
-                  console.log(`New message content: ${msg}`);
-                  welcomeChannel
-                    .fetchMessages()
-                    .then((cachedMessages) =>
-                      console.log(`Received ${messages.size} messages`)
-                    )
-                    .catch(console.error);
-                })
-                .catch(console.error);
-            }
-          }
-        });
-      }
-    }
-  }
-  for (const msg of botConfig.serverMessages) {
-    if (str === msg.reactMessage) {
-      // send answer from configuration json
-      message.channel.send(msg.botAnswer);
-    }
-    break;
-  }
-  if (str === "what is my avatar") {
-    // Send the user's avatar URL
-    message.reply(message.author.avatarURL);
-  }
-});
-
-client.on("messageReactionAdd", (reaction, user) => {
-  if (
-    !user.bot &&
-    roleMessageExist(reaction.message.guild.id, reaction.message.id)
-  ) {
-    const roleUser = reaction.message.guild.members.get(user.id);
-    for (const welcomeText of botConfig.welcomeChannelMessages) {
-      for (const role of welcomeText.roles) {
-        if (role.icon === reaction.emoji.name) {
-          roleUser.addRole(roleUser.guild.roles.find("name", role.roleName));
-          const msgText = role.roleSetText.replace("[username]", user.username);
-          reaction.message.channel.send(msgText).then((msg) => {
-            msg.delete(15000);
-          });
-        }
-      }
-    }
-  }
-});
-
-client.on("messageReactionRemove", (reaction, user) => {
-  if (
-    !user.bot &&
-    roleMessageExist(reaction.message.guild.id, reaction.message.id)
-  ) {
-    const roleUser = reaction.message.guild.members.get(user.id);
-    for (const welcomeText of botConfig.welcomeChannelMessages) {
-      for (const role of welcomeText.roles) {
-        if (role.icon === reaction.emoji.name) {
-          roleUser.removeRole(roleUser.guild.roles.find("name", role.roleName));
-          const msgText = role.roleRemoveText.replace(
-            "[username]",
-            user.username
-          );
-          reaction.message.channel.send(msgText).then((msg) => {
-            msg.delete(15000);
-          });
-        }
-      }
-    }
-  }
-});
 
 const checkGuildRoles = (guild) => {
   for (const welcomeText of botConfig.welcomeChannelMessages) {
@@ -227,6 +213,33 @@ const checkGuildRoles = (guild) => {
       }
     }
   }
+};
+
+const fetchCachedMessages = (welcomeChannel) => {
+  welcomeChannel
+    .fetchMessages()
+    .then((cachedMessages) => {
+      cachedMessages.forEach(function(cmsg, csmgId) {
+        cmsg.reactions.forEach(function(reaction, reactionId) {
+          reaction.fetchUsers();
+        });
+      });
+    })
+    .catch(console.error);
+};
+
+const removeBotMessage = (guildId) => {
+  botMessages.forEach((ele, index) => {
+    if (ele.guildId === guildId) {
+      botMessages.splice(index, 1);
+      jsonfile.writeFile(welcomeMessageFile, botMessages, (err) => {
+        if (err) {
+          console.error(err);
+        }
+        return;
+      });
+    }
+  });
 };
 
 const readConfig = () => {
@@ -245,25 +258,20 @@ const readConfig = () => {
             botConfig.welcomeChannelName
           );
           if (welcomeChannel) {
-            welcomeChannel
-              .fetchPinnedMessages()
-              .then((cachedMessages) => {
-                cachedMessages.forEach(function(cmsg, csmgId) {
-                  cmsg.reactions.forEach(function(reaction, reactionId) {
-                    reaction.fetchUsers();
-                  });
-                });
-              })
-              .catch(console.error);
+            fetchCachedMessages(welcomeChannel);
             welcomeChannel.fetchPinnedMessages().then((stickies) => {
               if (stickies) {
                 let roleMessageIds = getRoleMessageIds(guild.id);
-                if (
-                  !roleMessageIds ||
-                  !stickies.find("id", roleMessageIds[0])
-                ) {
+                if (!roleMessageIds) {
                   for (const msg of botConfig.welcomeChannelMessages) {
                     sendWelcomeMessage(welcomeChannel, msg);
+                  }
+                } else {
+                  if (!stickies.find("id", roleMessageIds[0])) {
+                    removeBotMessage(guild.id);
+                    for (const msg of botConfig.welcomeChannelMessages) {
+                      sendWelcomeMessage(welcomeChannel, msg);
+                    }
                   }
                 }
               }
