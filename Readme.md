@@ -93,14 +93,15 @@ Additional information regarding Emojis:
 The bot can handle three types of emojis:
 
 1.  Unicode emojis => just copy the raw 🤠 emoji in the configuration.json file (don't forget the "quotes"). Discord supports all official unicode emojis
-    (e.g. form here https://unicode.org/emoji/charts/full-emoji-list.html). Most code editors (e.g. VS Code, notepad++) can show the emoji by default if you copy them directly from browser (others maybe not => check your editor).
-    Example:
-    `"icon": "🤠",`
-2.  Alias => in case of uploaded emojis just add the alias, including the colons before and at the end of alias (without it will not work!!). You can find the alias near to the uploaded emoji in server settings.
-    Example:
+    (e.g. form here https://unicode.org/emoji/charts/full-emoji-list.html). Most code editors (e.g. VS Code, notepad++) can show the emoji by default if you copy them directly from browser (others maybe not => check your editor).  
+    Example:  
+    `"icon": "🤠",`  
+    The default chat commands like ":poop:" won't work for unicode emojis. You have to use the raw emoji.
+2.  Alias => in case of uploaded emojis just add the alias, including the colons before and at the end of alias (without it will not work!!). You can find the alias near to the uploaded emoji in server settings.  
+    Example:  
     `"icon": ":myemojialias:",`
 3.  ID => Each Emoji has an unique ID on each server. So this is just for special cases. To use an ID for an emoji add `"[id]"` before the emoji ID so that the bot knows it has to search for an emoji ID instead of an alias or a raw emoji
-    Example:
+    Example:  
     `"icon": "[id]1293345678120",`
 4.  The server will write a message if the emoji wasn't found => `"Emoji not found"`
 5.  Be sure to use unique emojis for each role (even if they are used for different messages). Otherwise it could cause errors (double assignment etc.)
