@@ -8,7 +8,7 @@
     BOTTOKEN=<YOUR BOT TOKEN>
     ```
 
-4.  Configure `configuration.json` to your wishes (roles will be automatically added on bot start if they not already exist)
+4.  Configure `configuration.json` to your wishes (roles will be automatically added on bot start if they not already exist). You can find a full example in the repository.
 
     1.  `"yourServerNames": ["Servername"]` => List of Guilds (Server) the bot is running on.
     2.  `"welcomeChannelName": "welcome",` => Name of channel the bot creates if it does not already exist and where it posts its role messages. Changing the name of the channel can cause problems. So if you want to change, just change the configuration.json and restart the bot. The bot reactions will be gone, but the role assignments will not be affected.
@@ -46,14 +46,31 @@
 5.  Be sure that the bot is assigned to server (guild) and has the role rights from below before starting the bot. Otherwise it could lead to a crash.
 6.  To start the bot write `node server.js` in the root of your bot folder
 
-Bot needs the following rights:
+## Edit/Update Bot messages
+
+Discord does even Administrators not allow to edit messages from other users, including bots. This bot has a `editBotMessage` interface. This can be used to update bot messages without restarting the bot or reset the channel.
+To use it just type  
+`!editBotMessage[1] <YOUR NEW MESSAGE>`  
+in the Chat.
+
+Explanation:
+
+* `!editBotMessage` is the command for the bot. This is only available for server administrators!!
+* `[1]` is the index of the message you want to edit. First message you added in `configuration.json` is index 1, second is index 2....
+* `<YOUR NEW MESSAGE>` the text of your new message. This will completly override the bot message. So if you want to edit the existing message, just copy and paste the original message and then edit.
+
+Important:
+
+* The reactions (and with it the role assignments etc.) are not affected by `editBotMessage`. So you can change the message without any lose of data.
+
+## Bot needs the following rights:
 
 1.  Role Management
 2.  Send Messages
 3.  Manage Messages (to create pin/sticky messages)
 4.  Bot role must be higher than the roles he provides (this will automatically be achieved if the bot creates on it's own the roles on startup (measn the role does not exist on bot start))
 
-Where can I run my bot?
+## Where can I run my bot?
 
 1.  You can host the bot on any server or on a webhoster which has node.js > V8.0.0 installed. For german speaking people witg some knowledge in Linux Terminal (or want to learn it) I prefer https://uberspace.de.
 2.  A free hosting solution would be Glitch.com (no guarantee for security issues from my side!)
@@ -76,7 +93,7 @@ Additional information regarding Emojis:
 The bot can handle three types of emojis:
 
 1.  Unicode emojis => just copy the raw 🤠 emoji in the configuration.json file (don't forget the "quotes"). Discord supports all official unicode emojis
-    (e.g. form here https://unicode.org/emoji/charts/full-emoji-list.html). Most code editors (e.g. VS Code, notepad++) can show the emoji by default if you copy them directly from browser (others maybe not => check yur editor).
+    (e.g. form here https://unicode.org/emoji/charts/full-emoji-list.html). Most code editors (e.g. VS Code, notepad++) can show the emoji by default if you copy them directly from browser (others maybe not => check your editor).
     Example:
     `"icon": "🤠",`
 2.  Alias => in case of uploaded emojis just add the alias, including the colons before and at the end of alias (without it will not work!!). You can find the alias near to the uploaded emoji in server settings.
